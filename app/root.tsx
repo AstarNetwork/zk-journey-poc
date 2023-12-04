@@ -5,8 +5,10 @@ import {Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration, useLoaderDa
 import styles from "./tailwind.css";
 import questStyles from "@bandit-network/quest-widget/dist/styles.css"
 import rainbowStyles from '@rainbow-me/rainbowkit/styles.css';
+import {BanditContextProvider} from "@bandit-network/quest-widget";
 import ThirdwebProviders from "~/providers/ThirdwebProviders";
 import RainbowProviders from "~/providers/RainbowProviders";
+import {SignatureContextProvider} from "~/context/SignatureContext";
 
 
 export const links: LinksFunction = () => [{rel: "stylesheet", href: styles}, {
@@ -34,7 +36,15 @@ export default function App() {
         <body>
         <RainbowProviders>
             <ThirdwebProviders twApiKey={twApiKey}>
-                <Outlet/>
+                <BanditContextProvider
+                    cluster={"devnet"}
+                    apiKey={"73d8ed4eeddc43d8b96e0b08afb675ac"}
+                >
+                    <SignatureContextProvider>
+
+                        <Outlet/>
+                    </SignatureContextProvider>
+                </BanditContextProvider>
             </ThirdwebProviders>
         </RainbowProviders>
         <ScrollRestoration/>
