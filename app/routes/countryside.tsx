@@ -164,7 +164,7 @@ export default function Countryside() {
                                     src={gacha}
                                     alt={`Gacha machine ${index}`}
                                     className="w-64 h-auto cursor-pointer"
-                                    onClick={() => handleImageClick(3444)}
+                                    onClick={() => handleImageClick(3459)}
                                 />
                                 <div
                                     id={`image_details_${index}`}

@@ -1,7 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {useAccount, useSignMessage} from "wagmi";
 import {useBanditContext} from "@bandit-network/quest-widget";
-import {useSignatureContext} from "~/context/SignatureContext";
 
 interface ModalProps {
 
@@ -12,9 +11,8 @@ const SignatureModal = ({}: ModalProps) => {
         const [isOpen, setIsOpen] = useState(false)
         const [message, setMessage] = useState("")
 
-        const {getSignatureMessage} = useBanditContext()
+        const {getSignatureMessage, walletSettings} = useBanditContext()
         const {signMessageAsync, isLoading} = useSignMessage()
-        const {updateSignature} = useSignatureContext()
 
         const previousAddress = useRef<`0x${string}`>()
 
@@ -27,7 +25,7 @@ const SignatureModal = ({}: ModalProps) => {
             const res = await signMessageAsync({
                 message
             })
-            updateSignature(res);
+            walletSettings?.setSignature(res);
             setIsOpen(false);
         }
 

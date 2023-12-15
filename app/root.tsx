@@ -1,3 +1,4 @@
+import React from "react";
 import {json, type LinksFunction, LoaderFunction} from "@remix-run/node";
 import {Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData,} from "@remix-run/react";
 
@@ -5,10 +6,10 @@ import {Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration, useLoaderDa
 import styles from "./tailwind.css";
 import questStyles from "@bandit-network/quest-widget/dist/styles.css"
 import rainbowStyles from '@rainbow-me/rainbowkit/styles.css';
-import {BanditContextProvider} from "@bandit-network/quest-widget";
 import ThirdwebProviders from "~/providers/ThirdwebProviders";
 import RainbowProviders from "~/providers/RainbowProviders";
 import {SignatureContextProvider} from "~/context/SignatureContext";
+import BanditProvider from "~/providers/BanditProvider";
 
 
 export const links: LinksFunction = () => [{rel: "stylesheet", href: styles}, {
@@ -36,15 +37,12 @@ export default function App() {
         <body>
         <RainbowProviders>
             <ThirdwebProviders twApiKey={twApiKey}>
-                <BanditContextProvider
-                    cluster={"devnet"}
-                    apiKey={"73d8ed4eeddc43d8b96e0b08afb675ac"}
-                >
+                <BanditProvider>
                     <SignatureContextProvider>
 
                         <Outlet/>
                     </SignatureContextProvider>
-                </BanditContextProvider>
+                </BanditProvider>
             </ThirdwebProviders>
         </RainbowProviders>
         <ScrollRestoration/>
