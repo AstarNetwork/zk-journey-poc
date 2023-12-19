@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import ImageCard from "../components/ImageCard";
+import { useAccount, useContractRead } from "wagmi";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
+
+const YOKI_CONTRACT_ADDRESS = "0x0";
 const cards = [
   {
     url: "https://imageio.forbes.com/specials-images/imageserve/6170e01f8d7639b95a7f2eeb/Sotheby-s-NFT-Natively-Digital-1-2-sale-Bored-Ape-Yacht-Club--8817-by-Yuga-Labs/0x0.png",
@@ -46,35 +50,46 @@ const cards = [
 
 const Gallery: React.FC = () => {
   const [oma, setOma] = useState<number>(4);
+  const { address } = useAccount();
 
+  // read yoki smart contract and fetch amount of OMA tokens tokenId=0. Use wagmi lib and connected wallet address
+  const fetchOma = async () => {
+
+    setOma(data.balance);
+  }
   return (
-    <div className="flex justify-between h-screen p-4">
-      <div className="w-1/5">
-        <p>{oma}</p>
-        <ImageCard image={cards[1]} />
+    <>
+      <div>
+        <ConnectButton />
       </div>
-      <div className="w-1/5 flex items-center justify-center">
-        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-          Open
-        </button>
+      <div className="flex justify-between h-screen p-4">
+        <div className="w-1/5">
+          <p>Oma tokens: {oma}</p>
+          <ImageCard image={cards[1]} />
+        </div>
+        <div className="w-1/5 flex items-center justify-center">
+          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Open
+          </button>
+        </div>
+        <div className="w-1/5 flex flex-col space-y-4">
+          {cards.slice(0, 3).map((card) => (
+            <ImageCard key={card.name} image={card} />
+          ))}
+        </div>
+        <div className="w-1/5 flex items-center justify-center">
+          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Evolve
+          </button>
+        </div>
+        <div className="w-1/5 flex flex-col space-y-4">
+          {cards.slice(0, 3).map((card) => (
+            <ImageCard key={card.name} image={card} />
+          ))}
+        </div>
       </div>
-      <div className="w-1/5 flex flex-col space-y-4">
-      {cards.slice(0, 3).map((card) => (
-          <ImageCard key={card.name} image={card} />
-        ))}
-      </div>
-      <div className="w-1/5 flex items-center justify-center">
-        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-          Evolve
-        </button>
-      </div>
-      <div className="w-1/5 flex flex-col space-y-4">
-        {cards.slice(0, 3).map((card) => (
-          <ImageCard key={card.name} image={card} />
-        ))}
-      </div>
-    </div>
+    </>
   );
-  };
+};
 
 export default Gallery;
