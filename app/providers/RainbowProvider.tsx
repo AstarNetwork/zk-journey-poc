@@ -8,7 +8,7 @@ const { chains, publicClient } = configureChains([astarZkatana, polygonMumbai], 
 
 const { connectors } = getDefaultWallets({
   appName: "App",
-  projectId: "WALLET_CONNECT_API_KEY",
+  projectId: "",
   chains,
 });
 

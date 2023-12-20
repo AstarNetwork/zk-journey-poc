@@ -10,6 +10,11 @@ import {
 } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Erc1155Mintable } from "@thirdweb-dev/sdk";
+import IpfsImage from "~/components/IpfsImage";
+import Capsule from "~/components/Capsule";
+import Oma from "~/components/Oma";
+import BaseYoki from "~/components/BaseYoki";
+import EvolvedYoki from "~/components/EvolvedYoki";
 
 const abi = [
   {
@@ -31,6 +36,13 @@ const abi = [
       { name: "id", type: "uint256" },
     ],
     outputs: [{ name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    name: "uri",
+    inputs: [{ name: "_tokenId", type: "uint256" }],
+    outputs: [{ name: "", type: "string" }],
     stateMutability: "view",
     type: "function",
   },
@@ -84,13 +96,7 @@ const cards = [
 ];
 
 const Gallery: React.FC = () => {
-  // const [oma, setOma] = useState<number>(4);
   const { address } = useAccount();
-
-  // read yoki smart contract and fetch amount of OMA tokens tokenId=0. Use wagmi lib and connected wallet address
-  // const fetchOma = async () => {
-  //   setOma(data.balance);
-  // };
 
   const { config } = usePrepareContractWrite({
     address: YOKI_CONTRACT_ADDRESS,
@@ -103,12 +109,28 @@ const Gallery: React.FC = () => {
     hash: data?.hash,
   });
 
-  const { data: readData } = useContractRead({
+  const { data: omaBalance } = useContractRead({
     address: YOKI_CONTRACT_ADDRESS,
     chainId: 1261120,
     abi,
     functionName: "balanceOf",
     args: [address, OMA_TOKEN_ID],
+  });
+
+  const { data: tokenUri } = useContractRead({
+    address: YOKI_CONTRACT_ADDRESS,
+    chainId: 1261120,
+    abi,
+    functionName: "uri",
+    args: [CAPSULE_TOKEN_ID],
+  });
+
+  const { data: capsuleBalance } = useContractRead({
+    address: YOKI_CONTRACT_ADDRESS,
+    chainId: 1261120,
+    abi,
+    functionName: "balanceOf",
+    args: [address, CAPSULE_TOKEN_ID],
   });
 
   return (
@@ -118,30 +140,14 @@ const Gallery: React.FC = () => {
       </div>
       <div className="flex justify-between h-screen p-4">
         <div className="w-1/5">
-          <ImageCard image={cards[1]} />
+          <Capsule />
           <hr />
-          <div>
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-              disabled={!write}
-              onClick={() => write?.()}
-            >
-              {isLoading ? "Minting OMA..." : "Mint OMA"}
-            </button>
-            <p>Oma tokens: {readData?.toString() || "?"}</p>
-            {isSuccess && (
-              <div>
-                Successfully minted OMA!
-                <div>
-                  <a href={`https://zkatana.blockscout.com/tx/${data?.hash}`}>
-                    BlockExplorer
-                  </a>
-                </div>
-              </div>
-            )}
-          </div>
+          <Oma />
         </div>
-        <div className="w-1/5 flex items-center justify-center">
+        <div className="w-1/5">
+          <BaseYoki />
+        </div>
+        {/* <div className="w-1/5 flex items-center justify-center">
           <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
             Open
           </button>
@@ -150,16 +156,19 @@ const Gallery: React.FC = () => {
           {cards.slice(0, 3).map((card) => (
             <ImageCard key={card.name} image={card} />
           ))}
-        </div>
-        <div className="w-1/5 flex items-center justify-center">
+        </div> */}
+        {/* <div className="w-1/5 flex items-center justify-center">
           <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
             Evolve
           </button>
-        </div>
-        <div className="w-1/5 flex flex-col space-y-4">
+        </div> */}
+        {/* <div className="w-1/5 flex flex-col space-y-4">
           {cards.slice(0, 3).map((card) => (
             <ImageCard key={card.name} image={card} />
           ))}
+        </div> */}
+        <div className="w-1/5">
+          <EvolvedYoki />
         </div>
       </div>
     </>
