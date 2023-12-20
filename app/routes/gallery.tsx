@@ -1,10 +1,45 @@
 import React, { useState } from "react";
 import ImageCard from "../components/ImageCard";
-import { useAccount, useContractRead } from "wagmi";
+import {
+  useAccount,
+  useContractRead,
+  useContractWrite,
+  usePrepareContractWrite,
+  useWaitForTransaction,
+  useBalance,
+} from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { Erc1155Mintable } from "@thirdweb-dev/sdk";
 
+const abi = [
+  {
+    name: "mint",
+    inputs: [
+      { name: "account", type: "address" },
+      { name: "id", type: "uint256" },
+      { name: "amount", type: "uint256" },
+      { name: "", type: "bytes" },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+    outputs: [],
+  },
+  {
+    name: "balanceOf",
+    inputs: [
+      { name: "account", type: "address" },
+      { name: "id", type: "uint256" },
+    ],
+    outputs: [{ name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+];
 
-const YOKI_CONTRACT_ADDRESS = "0x0";
+const YOKI_CONTRACT_ADDRESS = "0x4e14510c4DCEB04567CA5752C953c49D13254fe7";
+const OMA_TOKEN_ID = 0;
+const CAPSULE_TOKEN_ID = 1;
+
 const cards = [
   {
     url: "https://imageio.forbes.com/specials-images/imageserve/6170e01f8d7639b95a7f2eeb/Sotheby-s-NFT-Natively-Digital-1-2-sale-Bored-Ape-Yacht-Club--8817-by-Yuga-Labs/0x0.png",
@@ -49,14 +84,33 @@ const cards = [
 ];
 
 const Gallery: React.FC = () => {
-  const [oma, setOma] = useState<number>(4);
+  // const [oma, setOma] = useState<number>(4);
   const { address } = useAccount();
 
   // read yoki smart contract and fetch amount of OMA tokens tokenId=0. Use wagmi lib and connected wallet address
-  const fetchOma = async () => {
+  // const fetchOma = async () => {
+  //   setOma(data.balance);
+  // };
 
-    setOma(data.balance);
-  }
+  const { config } = usePrepareContractWrite({
+    address: YOKI_CONTRACT_ADDRESS,
+    abi: abi,
+    functionName: "mint",
+    args: [address, OMA_TOKEN_ID, 1, "0x"],
+  });
+  const { data, write } = useContractWrite(config);
+  const { isLoading, isSuccess } = useWaitForTransaction({
+    hash: data?.hash,
+  });
+
+  const { data: readData } = useContractRead({
+    address: YOKI_CONTRACT_ADDRESS,
+    chainId: 1261120,
+    abi,
+    functionName: "balanceOf",
+    args: [address, OMA_TOKEN_ID],
+  });
+
   return (
     <>
       <div>
@@ -64,8 +118,28 @@ const Gallery: React.FC = () => {
       </div>
       <div className="flex justify-between h-screen p-4">
         <div className="w-1/5">
-          <p>Oma tokens: {oma}</p>
           <ImageCard image={cards[1]} />
+          <hr />
+          <div>
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              disabled={!write}
+              onClick={() => write?.()}
+            >
+              {isLoading ? "Minting OMA..." : "Mint OMA"}
+            </button>
+            <p>Oma tokens: {readData?.toString() || "?"}</p>
+            {isSuccess && (
+              <div>
+                Successfully minted OMA!
+                <div>
+                  <a href={`https://zkatana.blockscout.com/tx/${data?.hash}`}>
+                    BlockExplorer
+                  </a>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
         <div className="w-1/5 flex items-center justify-center">
           <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
