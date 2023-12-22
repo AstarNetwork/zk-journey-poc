@@ -15,7 +15,9 @@ export default {
       https: true,
       zlib: true,
       util: true,
-      crypto: true
+      crypto: true,
+      path: true,
+      os: true,
     },
   },
 };

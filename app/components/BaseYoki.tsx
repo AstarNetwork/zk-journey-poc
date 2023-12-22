@@ -9,6 +9,7 @@ import {
 } from "wagmi";
 
 import IpfsImage from "~/components/IpfsImage";
+import mintYoki from "~/utils/mintYoki";
 
 const abi = [
   {
@@ -45,19 +46,20 @@ const abi = [
 const YOKI_CONTRACT_ADDRESS = "0x4e14510c4DCEB04567CA5752C953c49D13254fe7";
 const YOKI_TOKEN_ID = 2;
 
-const BaseYoki = () => {
-  const { address } = useAccount();
+const BaseYoki = ({privateKey}: {privateKey: string}) => {
+  const { address: connectedUserAccount } = useAccount();
 
-  const { config } = usePrepareContractWrite({
-    address: YOKI_CONTRACT_ADDRESS,
-    abi: abi,
-    functionName: "mint",
-    args: [address, YOKI_TOKEN_ID, 1, "0x"],
-  });
-  const { data, write } = useContractWrite(config);
-  const { isLoading, isSuccess } = useWaitForTransaction({
-    hash: data?.hash,
-  });
+
+  // const { config } = usePrepareContractWrite({
+  //   address: YOKI_CONTRACT_ADDRESS,
+  //   abi: abi,
+  //   functionName: "mint",
+  //   args: [address, YOKI_TOKEN_ID, 1, "0x"],
+  // });
+  // const { data, write } = useContractWrite(config);
+  // const { isLoading, isSuccess } = useWaitForTransaction({
+  //   hash: data?.hash,
+  // });
 
   const { data: tokenUri } = useContractRead({
     address: YOKI_CONTRACT_ADDRESS,
@@ -72,12 +74,13 @@ const BaseYoki = () => {
     chainId: 1261120,
     abi,
     functionName: "balanceOf",
-    args: [address, YOKI_TOKEN_ID],
+    args: [connectedUserAccount, YOKI_TOKEN_ID],
   });
 
   useEffect(() => {
-    if (isSuccess) refetchBalance();
-  }, [refetchBalance, isSuccess]);
+    console.log("refetching balance");
+    refetchBalance();
+  }, [refetchBalance]);
 
   return (
     <div className="flex flex-col justify-start items-center w-full">
@@ -90,10 +93,9 @@ const BaseYoki = () => {
       </div>
       <button
         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        disabled={!write}
-        onClick={() => write?.()}
+        onClick={() => mintYoki(privateKey, connectedUserAccount || "")}
       >
-        {isLoading ? "Minting YOKI..." : "Open Capsule"}
+        Open Capsule
       </button>
     </div>
   );

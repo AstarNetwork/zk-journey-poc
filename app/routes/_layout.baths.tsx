@@ -17,11 +17,13 @@ export const loader: LoaderFunction = async () => {
     },
   });
   const apiData = await strapiLoader("/baths-page", query);
-  return json(apiData);
+  const privateKey: string = process.env.PRIVATE_KEY!;
+  const updatedApiData = { ...apiData, privateKey };
+  return json (updatedApiData);
 };
 
 export default function Baths() {
-  const { apiData, imageUrlPrefix } = useLoaderData<LoaderFunction>();
+  const { apiData, privateKey, imageUrlPrefix } = useLoaderData<LoaderFunction>();
 
   const backgroundImage = apiData.data.background_image.url;
   const fullImageUrl = `${imageUrlPrefix}${backgroundImage}`;
@@ -43,7 +45,7 @@ export default function Baths() {
           className="p-4 w-[25vw] rounded-md"
           style={{ backgroundColor: "rgba(255,255,255,0.5)" }}
         >
-          <BaseYoki />
+          <BaseYoki privateKey={privateKey}/>
         </div>
         <div
           className="p-4 w-[25vw] rounded-md"
